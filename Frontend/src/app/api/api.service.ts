@@ -5,6 +5,7 @@ import { map, Observable, Subject } from 'rxjs';
 import { CreateGame } from './models/create-game.model';
 import { Place } from './models/place.model';
 import { GameStage } from './stages/game-stage.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class ApiService implements OnDestroy {
 
   constructor(private httpClient: HttpClient) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('api/game-hub')
+      .withUrl(`${environment.apiUrl}/game-hub`, { withCredentials: false })
       .build();
 
     this.registerMessageHandlers();
@@ -32,12 +33,12 @@ export class ApiService implements OnDestroy {
   }
 
   public findPlaces(search: string): Observable<Place[]> {
-    return this.httpClient.get<Place[]>(`/api/find-places?search=${search}`);
+    return this.httpClient.get<Place[]>(`${environment.apiUrl}/find-places?search=${search}`);
   }
 
   public createGame(placeId: string): Observable<string> {
     return this.httpClient
-      .post<CreateGame>('/api/create-game', {
+      .post<CreateGame>(`${environment.apiUrl}/create-game`, {
         placeId,
       })
       .pipe(map((response) => response.gameId));
