@@ -56,7 +56,7 @@ jobs:
 
       - name: Build
         working-directory: Frontend
-        run: npm run build -- --configuration=production
+        run: npx ng build --configuration=production
 
       - name: Deploy to Azure Static Web Apps
         uses: azure/static-web-apps-deploy@v1
