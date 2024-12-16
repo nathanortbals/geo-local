@@ -1,0 +1,16 @@
+@if (stage$ | async; as stage) {
+  @switch (stage.type) {
+    @case ("Lobby") {
+      <app-lobby [lobby]="stage" />
+    }
+    @case ("Guessing") {
+      <app-guessing [guessing]="stage" />
+    }
+    @case ("RoundResults") {
+      <app-round-results [roundResults]="stage" />
+    }
+    @case ("FinalResults") {
+      <app-final-results [finalResults]="stage" />
+    }
+  }
+}

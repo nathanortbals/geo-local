@@ -1,0 +1,27 @@
+<app-progress-bar
+  [targetTime]="targetTime"
+  [totalDuration]="guessing.timeLimitSeconds"
+/>
+<div
+  class="fixed top-6 left-0 w-32 pl-8 h-10 bg-[#444444] flex items-center z-10 shadow-2xl rounded-r-full"
+>
+  <p class="text-white text-lg font-bold">
+    {{ timer$ | async | time }}
+  </p>
+</div>
+<div
+  class="fixed top-6 right-0 w-44 pr-8 h-10 bg-[#444444] flex items-center justify-end z-10 shadow-lg rounded-l-full"
+>
+  <p class="text-white mr-2">Round</p>
+  <p class="text-white text-lg font-bold">{{ guessing.roundNumber }}/5</p>
+</div>
+
+<div class="fixed inset-0">
+  <div class="h-full" #streetView></div>
+</div>
+
+<div
+  class="fixed w-full h-full bottom-8 right-8 max-w-80 max-h-48 hover:max-w-4xl hover:max-h-[30rem] transition-all"
+>
+  <div #map class="h-full"></div>
+</div>

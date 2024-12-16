@@ -1,0 +1,6 @@
+@GeoLocal_HostAddress = http://localhost:5128
+
+GET {{GeoLocal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

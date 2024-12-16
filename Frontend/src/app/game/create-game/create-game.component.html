@@ -1,0 +1,73 @@
+<div
+  class="h-full bg-cover bg-center flex flex-col items-center justify-center bg-black gap-20 p-8"
+  style="background-image: url(&quot;/background-bright.webp&quot;)"
+>
+  <div class="flex">
+    <h1
+      class="text-6xl text-white font-mono min-h-16 text-center [text-shadow:_3px_3px_0_rgb(0_0_0_/_40%)]"
+    >
+      {{ currentTitle$ | async }}
+      <span class="border-r-4 border-white animate-blink"></span>
+    </h1>
+  </div>
+
+  @let searchResults = searchResults$ | async;
+  @let searchResultsVisible =
+    searchResults && formGroup.value.selectedPlaceId === null;
+
+  <div class="relative w-full max-w-96">
+    <input
+      [formControl]="formGroup.controls.searchTerm"
+      placeholder="Find your city"
+      class="h-10 bg-gray-100 w-full px-9 focus:outline-none text-center rounded-t-[1.25rem] focus:placeholder:invisible shadow-lg"
+      [ngClass]="{
+        'rounded-b-none': searchResultsVisible,
+        'rounded-b-[1.25rem]': !searchResultsVisible,
+      }"
+    />
+
+    <img
+      src="search-icon.svg"
+      alt="Search"
+      class="absolute left-0 top-0 h-5 mt-2.5 ml-3"
+    />
+
+    @if (formGroup.controls.searchTerm.value) {
+      <button
+        (click)="clearSearch()"
+        class="absolute right-0 top-0 h-5 mt-2.5 mr-3"
+      >
+        <img src="x-icon.svg" alt="Clear Search" class="h-full" />
+      </button>
+    }
+
+    @if (searchResultsVisible) {
+      <div
+        class="absolute bg-gray-100 left-0 rounded-b-[1.25rem] overflow-hidden w-full shadow-lg"
+      >
+        @for (searchResult of searchResults; track searchResult.id) {
+          <button
+            (click)="selectPlace(searchResult)"
+            class="h-10 px-4 truncate w-full hover:bg-gray-300"
+          >
+            {{ searchResult.name }}
+          </button>
+        } @empty {
+          <p class="w-full text-center h-10 text-gray-600">No results found</p>
+        }
+      </div>
+    }
+
+    @if (formGroup.valid) {
+      <div class="flex justify-center absolute mt-4 w-full">
+        <app-button
+          (clicked)="createGame()"
+          class="block w-36"
+          [loading]="loading"
+        >
+          Play
+        </app-button>
+      </div>
+    }
+  </div>
+</div>

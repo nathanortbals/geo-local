@@ -1,0 +1,16 @@
+<div
+  class="h-full bg-gradient-to-t from-gray-950 to-[#001941] flex flex-col items-center justify-center p-4 gap-8"
+>
+  <h1 class="text-white text-3xl font-bold italic">{{ lobby.bounds.name }}</h1>
+  <div
+    #previewMap
+    class="h-96 w-full max-w-2xl rounded-3xl border-white border-4"
+  ></div>
+  <div class="flex flex-col items-center gap-2">
+    <app-button (clicked)="startGame()" class="w-52">Start Game</app-button>
+    <p class="text-white font-bold">Or</p>
+    <app-link-button routerLink="/" class="w-52">
+      Choose a Different City
+    </app-link-button>
+  </div>
+</div>
