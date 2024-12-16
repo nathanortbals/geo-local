@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
@@ -23,11 +22,14 @@ builder.Services.AddHostedService<GameWorker>();
 
 // Configuration
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
+app.UseCors(config =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var allowedOrigins = builder.Configuration.GetValue<string>("Cors:AllowedOrigins") ?? throw new InvalidOperationException("Cors Allowed Origins must be set");
+    config.WithOrigins(allowedOrigins);
+    config.AllowAnyHeader();
+});
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.MapHub<GameHub>("/game-hub");
