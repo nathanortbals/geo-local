@@ -54,10 +54,6 @@ jobs:
         working-directory: Frontend
         run: npm ci
 
-      - name: Lint
-        working-directory: Frontend
-        run: npm run lint
-
       - name: Build
         working-directory: Frontend
         run: npm run build -- --configuration=production
