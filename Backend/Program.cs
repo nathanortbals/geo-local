@@ -1,4 +1,3 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using GeoLocal.Game;
 using GeoLocal.GoogleMaps;
 
@@ -6,9 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOpenTelemetry().UseAzureMonitor();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton((sp) =>
@@ -25,6 +22,12 @@ builder.Services.AddHostedService<GameWorker>();
 
 // Configuration
 var app = builder.Build();
+app.UseCors(config =>
+{
+    var allowedOrigins = builder.Configuration.GetValue<string>("Cors:AllowedOrigins") ?? throw new InvalidOperationException("Cors Allowed Origins must be set");
+    config.WithOrigins(allowedOrigins);
+    config.AllowAnyHeader();
+});
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();

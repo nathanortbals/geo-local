@@ -28,10 +28,12 @@ jobs:
         run: dotnet build Backend --configuration Release --no-restore
 
       - name: Publish
+        if: github.ref == 'refs/heads/main'
         run: dotnet publish Backend -c Release -o publish
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
+        if: github.ref == 'refs/heads/main'
         with:
           app-name: GeoLocalApi
           slot-name: 'production' # Change if using deployment slots
@@ -60,6 +62,7 @@ jobs:
 
       - name: Deploy to Azure Static Web Apps
         uses: azure/static-web-apps-deploy@v1
+        if: github.ref == 'refs/heads/main'
         with:
           action: 'upload'
           app_location: 'Frontend/dist/geo-local/browser'
