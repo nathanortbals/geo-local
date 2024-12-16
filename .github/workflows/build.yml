@@ -48,15 +48,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20'
+          node-version: '22.4'
 
       - name: Install dependencies
         working-directory: Frontend
-        run: npm install
+        run: npm ci
 
       - name: Build
         working-directory: Frontend
-        run: npx ng build --configuration=production
+        run: npm run build -- --configuration=production
 
       - name: Deploy to Azure Static Web Apps
         uses: azure/static-web-apps-deploy@v1
