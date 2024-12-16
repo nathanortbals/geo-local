@@ -23,11 +23,8 @@ builder.Services.AddHostedService<GameWorker>();
 
 // Configuration
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.MapHub<GameHub>("/game-hub");
