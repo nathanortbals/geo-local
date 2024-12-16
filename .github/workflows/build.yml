@@ -51,9 +51,11 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
+        working-directory: Frontend
         run: npm ci
 
       - name: Lint
+        working-directory: Frontend
         run: npm run lint
 
       - name: Build
