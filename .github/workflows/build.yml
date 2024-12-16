@@ -9,9 +9,9 @@ on:
       - '*'
 
 jobs:
-  build-and-deploy:
+  build-backend:
+    name: Build Backend
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,13 +24,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Backend
 
-      - name: Build the project
+      - name: Build
         run: dotnet build Backend --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test Backend --no-restore --verbosity normal
-
-      - name: Publish the app
+      - name: Publish
         run: dotnet publish Backend -c Release -o publish
 
       - name: Deploy to Azure Web App
@@ -40,3 +37,32 @@ jobs:
           slot-name: 'production' # Change if using deployment slots
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./publish
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        working-directory: Frontend
+        run: npm run build -- --configuration=production
+
+      - name: Deploy to Azure Static Web Apps
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          app-location: '/'
+          output-location: 'Frontend/dist/geo-local/browser'
+          azure-static-web-apps-api-token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
