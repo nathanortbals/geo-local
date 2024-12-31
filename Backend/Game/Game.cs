@@ -35,7 +35,7 @@ namespace GeoLocal.Game
             this.gameService = gameService;
         }
 
-        public async Task<string?> JoinGame(string playerName)
+        public async Task<string?> JoinGame(string playerName, string connectionId)
         {
             if (Players.Count >= 30)
             {
@@ -46,7 +46,7 @@ namespace GeoLocal.Game
                 return "Name is already taken";
             }
 
-            Players.Add(new Player(playerName, this));
+            Players.Add(new Player(playerName, connectionId, this));
             await UpdateStage(new Lobby(Id, Bounds, Players));
             
             return null;

@@ -10,7 +10,7 @@ namespace GeoLocal.Game
         {
             var game = gameService.GetGame(gameId) ?? throw new HubException("Game was not found");
             
-            var error = await game.JoinGame(playerName);
+            var error = await game.JoinGame(playerName, Context.ConnectionId);
             if (error is not null)
             {
                 throw new HubException(error);
@@ -18,6 +18,26 @@ namespace GeoLocal.Game
 
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
             await Clients.Caller.ReceiveGameStage(game.CurrentStage);
+        }
+
+        public async Task RejoinGame(string gameId, string playerName, string lastConnectionId)
+        {
+            var game = gameService.GetGame(gameId) ?? throw new HubException("Game was not found");
+
+            var player = game.Players.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.CurrentCultureIgnoreCase));
+            if (player is null)
+            {
+                return;
+            }
+
+            if (player.ConnectionId == lastConnectionId)
+            {
+                player.Reconnect(Context.ConnectionId);
+
+                await Groups.RemoveFromGroupAsync(lastConnectionId, gameId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
+                await Clients.Caller.ReceiveGameStage(game.CurrentStage);
+            }
         }
 
         public async Task StartGame(string gameId)

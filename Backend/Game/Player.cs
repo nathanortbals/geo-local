@@ -1,12 +1,20 @@
-﻿using System.Drawing;
+﻿using Microsoft.AspNetCore.Connections.Abstractions;
+using System.Drawing;
 
 namespace GeoLocal.Game
 {
-    public class Player(string name, Game game)
+    public class Player(string name, string connectionId, Game game)
     {
         public string Name { get; } = name;
 
+        public string ConnectionId { get; private set; } = connectionId;
+
         public string Color { get; } = GetPlayerColor(game);
+
+        public void Reconnect(string newConnectionId)
+        {
+            ConnectionId = newConnectionId;
+        } 
 
         private static readonly HashSet<string> colors =
         [

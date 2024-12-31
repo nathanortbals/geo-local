@@ -32,6 +32,15 @@ export class ApiService implements OnDestroy {
     await this.hubConnection.start();
   }
 
+  public getConnectionId(): string {
+    const connectionId = this.hubConnection.connectionId;
+    if (!connectionId) {
+      throw new Error('Not connected to the hub');
+    }
+
+    return connectionId;
+  }
+
   public findPlaces(search: string): Observable<Place[]> {
     return this.httpClient.get<Place[]>(
       `${environment.apiUrl}/find-places?search=${search}`,
@@ -50,6 +59,14 @@ export class ApiService implements OnDestroy {
     return from(this.hubConnection.invoke('JoinGame', gameId, playerName)).pipe(
       catchError((error: Error) => throwError(() => this.handleError(error))),
     );
+  }
+
+  public rejoinGame(
+    gameId: string,
+    playerName: string,
+    connectionId: string,
+  ): void {
+    this.hubConnection.send('RejoinGame', gameId, playerName, connectionId);
   }
 
   public startGame(gameId: string): void {

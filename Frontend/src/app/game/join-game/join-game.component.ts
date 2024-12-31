@@ -4,10 +4,12 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
+  OnInit,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../api/api.service';
 import { ButtonComponent } from '../../shared/button/button.component';
+import { JoinGameCacheService } from './join-game-cache.service';
 
 @Component({
   selector: 'app-join-game',
@@ -15,7 +17,7 @@ import { ButtonComponent } from '../../shared/button/button.component';
   templateUrl: './join-game.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JoinGameComponent {
+export class JoinGameComponent implements OnInit {
   @Input({ required: true }) gameId!: string;
 
   loading = false;
@@ -26,7 +28,12 @@ export class JoinGameComponent {
   constructor(
     private readonly apiService: ApiService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly joinGameCacheService: JoinGameCacheService,
   ) {}
+
+  ngOnInit(): void {
+    this.joinGameCacheService.rejoinGameIfCached(this.gameId);
+  }
 
   joinGame() {
     if (this.formControl.invalid) {
@@ -34,10 +41,12 @@ export class JoinGameComponent {
       return;
     }
 
-    this.loading = true;
+    const name = this.formControl.value!;
 
-    this.apiService.joinGame(this.gameId, this.formControl.value!).subscribe({
+    this.loading = true;
+    this.apiService.joinGame(this.gameId, name).subscribe({
       next: () => {
+        this.joinGameCacheService.setCache(this.gameId, name);
         this.loading = false;
         this.changeDetectorRef.markForCheck();
       },
