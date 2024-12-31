@@ -1,34 +1,81 @@
 <div
-  class="h-full bg-gradient-to-t from-gray-950 to-[#001941] flex flex-col items-center justify-center p-4 gap-8"
+  class="h-full bg-gradient-to-t from-gray-950 to-[#001941] grid grid-cols-[1fr_minmax(0px,42rem)_minmax(0px,24rem)_1fr] grid-rows-[1fr_2.25rem_24rem_min-content_3rem_1fr] gap-x-8 gap-y-4"
 >
-  <h1 class="text-white text-3xl italic font-bold">
+  <h1
+    class="col-start-2 row-start-2 text-white text-3xl italic font-bold text-center"
+  >
     Round {{ roundResults.roundNumber }}
   </h1>
   <div
     #map
-    class="h-96 w-full max-w-2xl rounded-3xl border-white border-4"
+    class="col-start-2 row-start-3 h-full w-full rounded-3xl border-white border-4"
   ></div>
-  <div class="flex flex-col items-center gap-4">
-    <p class="text-yellow-500 text-3xl">{{ roundResults.score | number }}</p>
-    <div class="h-2 rounded-full bg-yellow-200 w-80 overflow-hidden">
-      <div
-        class="h-2 rounded-full bg-yellow-500"
-        [style.width.%]="(roundResults.score / 5000) * 100"
-      ></div>
+  @if (myRoundResults) {
+    <div class="col-start-2 row-start-4 flex flex-col items-center gap-4">
+      <p class="text-yellow-500 text-3xl">
+        {{ myRoundResults.roundScore | number }}
+      </p>
+      <div class="h-2 rounded-full bg-yellow-200 w-80 overflow-hidden">
+        <div
+          class="h-2 rounded-full bg-yellow-500"
+          [style.width.%]="(myRoundResults.roundScore / 5000) * 100"
+        ></div>
+      </div>
+      <p class="text-gray-300">
+        @if (myRoundResults.distanceInMeters) {
+          Your guess was
+          <strong>{{ myRoundResults.distanceInMeters | distance }}</strong> from
+          the correct location.
+        } @else {
+          You did not submit a guess in time.
+        }
+      </p>
     </div>
-    <p class="text-gray-300">
-      @if (roundResults.distanceInMeters) {
-        Your guess was
-        <strong>{{ roundResults.distanceInMeters | distance }}</strong> from the
-        correct location.
-      } @else {
-        You did not submit a guess in time.
-      }
-    </p>
+  }
+  <div class="col-start-2 row-start-5 flex justify-center">
+    @if (roundResults.isFinalRound) {
+      <app-button (clicked)="showFinalResults()">
+        Show Final Results
+      </app-button>
+    } @else {
+      <app-button (clicked)="startNextRound()"> Start Next Round </app-button>
+    }
   </div>
-  @if (roundResults.isFinalRound) {
-    <app-button (clicked)="showFinalResults()"> Show Final Results </app-button>
-  } @else {
-    <app-button (clicked)="startNextRound()"> Start Next Round </app-button>
+
+  @if (roundResults.players.length > 0) {
+    <h1
+      class="col-start-3 row-start-2 text-white text-3xl font-bold text-center"
+    >
+      Players
+    </h1>
+    <div class="h-full col-start-3 row-start-3 bg-gray-800 rounded-3xl">
+      <div class="flex items-center justify-between px-4 py-4">
+        <p class="text-gray-500">Place</p>
+        <p class="text-nowrap col-span-2">
+          <span class="text-gray-500">Total Score</span>
+          <span class="text-yellow-600"> + Round</span>
+        </p>
+      </div>
+      <div class="h-full overflow-y-auto flex flex-col gap-4 px-4">
+        @for (
+          player of roundResults.players;
+          track player.playerName;
+          let i = $index
+        ) {
+          <div class="flex items-center gap-4">
+            <p class="text-gray-400 w-3">{{ i + 1 }}.</p>
+            <app-player-avatar
+              [name]="player.playerName"
+              [color]="player.playerColor"
+            />
+            <p class="flex-1 text-white">{{ player.playerName }}</p>
+            <p class="text-white">{{ player.totalScore | number }}</p>
+            <p class="text-yellow-500 w-10 text-right">
+              +{{ player.roundScore | number }}
+            </p>
+          </div>
+        }
+      </div>
+    </div>
   }
 </div>

@@ -4,7 +4,6 @@ import {
   Input,
   OnChanges,
 } from '@angular/core';
-import { Player } from '../../api/models/players.model';
 
 @Component({
   selector: 'app-player-avatar',
@@ -13,14 +12,15 @@ import { Player } from '../../api/models/players.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlayerAvatarComponent implements OnChanges {
-  @Input({ required: true }) player!: Player;
+  @Input({ required: true }) name!: string;
+  @Input({ required: true }) color!: string;
 
   textColor = 'black';
   firstInitial = '';
 
   ngOnChanges(): void {
-    this.textColor = this.getContrastingTextColor(this.player.color);
-    this.firstInitial = this.player.name.at(0)?.toUpperCase() ?? '';
+    this.textColor = this.getContrastingTextColor(this.color);
+    this.firstInitial = this.name.at(0)?.toUpperCase() ?? '';
   }
 
   private getContrastingTextColor(hexColor: string) {

@@ -23,7 +23,7 @@
     <div class="h-full overflow-y-auto flex flex-1 flex-col gap-4 py-6 px-4">
       @for (player of lobby.players; track player.name) {
         <div class="flex gap-4">
-          <app-player-avatar [player]="player" />
+          <app-player-avatar [name]="player.name" [color]="player.color" />
           <p class="text-white text-xl">{{ player.name }}</p>
         </div>
       }

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Connections.Abstractions;
-using System.Drawing;
-
-namespace GeoLocal.Game
+﻿namespace GeoLocal.Game
 {
     public class Player(string name, string connectionId, Game game)
     {
@@ -10,6 +7,21 @@ namespace GeoLocal.Game
         public string ConnectionId { get; private set; } = connectionId;
 
         public string Color { get; } = GetPlayerColor(game);
+
+        public bool IsHost { get; } = game.Players.Count == 0;
+
+        public Game Game { get; } = game;
+
+        public int TotalScore
+        {
+            get
+            {
+                return Game.Rounds
+                    .Where(r => r.Guesses.ContainsKey(Name))
+                    .Select(r => r.Guesses[Name])
+                    .Sum(g => g.Score);
+            }
+        }
 
         public void Reconnect(string newConnectionId)
         {

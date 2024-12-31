@@ -16,6 +16,11 @@ export class ApiService implements OnDestroy {
   private gameStage = new Subject<GameStage>();
   gameStage$ = this.gameStage.asObservable();
 
+  private currentPlayerName: string | null = null;
+  public get playerName(): string | null {
+    return this.currentPlayerName;
+  }
+
   constructor(private httpClient: HttpClient) {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`${environment.apiUrl}/game-hub`, { withCredentials: false })
@@ -96,6 +101,10 @@ export class ApiService implements OnDestroy {
   private registerMessageHandlers() {
     this.hubConnection.on('ReceiveGameStage', (stage: GameStage) => {
       this.gameStage.next(stage);
+    });
+
+    this.hubConnection.on('ReceiveIdentity', (playerName: string) => {
+      this.currentPlayerName = playerName;
     });
   }
 

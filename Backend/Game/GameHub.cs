@@ -1,6 +1,4 @@
-﻿using GeoLocal.Game.Stages;
-using Microsoft.AspNetCore.SignalR;
-using System.Text.Json;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace GeoLocal.Game
 {
@@ -18,6 +16,7 @@ namespace GeoLocal.Game
 
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
             await Clients.Caller.ReceiveGameStage(game.CurrentStage);
+            await Clients.Caller.ReceiveIdentity(playerName);
         }
 
         public async Task RejoinGame(string gameId, string playerName, string lastConnectionId)
@@ -37,6 +36,7 @@ namespace GeoLocal.Game
                 await Groups.RemoveFromGroupAsync(lastConnectionId, gameId);
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
                 await Clients.Caller.ReceiveGameStage(game.CurrentStage);
+                await Clients.Caller.ReceiveIdentity(playerName);
             }
         }
 
@@ -59,7 +59,13 @@ namespace GeoLocal.Game
                 return Task.CompletedTask;
             }
 
-            game.SubmitGuess(roundNumber, guess);
+            var player = game.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+            if (player == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            game.SubmitGuess(roundNumber, player.Name, guess);
             return Task.CompletedTask;
         }
 

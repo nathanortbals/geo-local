@@ -8,15 +8,20 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ApiService } from '../../api/api.service';
-import { RoundResults } from '../../api/stages/round-results.model';
+import {
+  PlayerRoundResults,
+  RoundResults,
+} from '../../api/stages/round-results.model';
 import { GoogleMapsService } from '../../google-maps.service';
 import { ButtonComponent } from '../../shared/button/button.component';
 import { DistancePipe } from '../../shared/distance-pipe/distance.pipe';
+import { DomService } from '../../shared/dom.service';
 import { NumberPipe } from '../../shared/number-pipe/number.pipe';
+import { PlayerAvatarComponent } from '../../shared/player-avatar/player-avatar.component';
 
 @Component({
   selector: 'app-round-results',
-  imports: [ButtonComponent, NumberPipe, DistancePipe],
+  imports: [ButtonComponent, NumberPipe, DistancePipe, PlayerAvatarComponent],
   templateUrl: './round-results.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -26,13 +31,20 @@ export class RoundResultsComponent implements OnChanges, AfterViewInit {
   @ViewChild('map', { read: ElementRef })
   map: ElementRef<HTMLElement> | undefined;
 
+  myRoundResults: PlayerRoundResults | undefined;
+
   constructor(
     private readonly googleMapsService: GoogleMapsService,
     private readonly apiService: ApiService,
+    private readonly domService: DomService,
   ) {}
 
   ngOnChanges(): void {
     this.createMap();
+
+    this.myRoundResults = this.roundResults.players.find(
+      (player) => player.playerName === this.apiService.playerName,
+    );
   }
 
   ngAfterViewInit(): void {
@@ -48,70 +60,97 @@ export class RoundResultsComponent implements OnChanges, AfterViewInit {
       disableDefaultUI: true,
     });
 
-    const guess = this.roundResults.guess
-      ? {
-          lat: this.roundResults.guess.latitude,
-          lng: this.roundResults.guess.longitude,
-        }
-      : null;
+    this.drawTarget(map);
 
-    if (guess) {
-      this.googleMapsService.createPin({
-        map,
-        position: guess,
-      });
-    }
-
-    const location = {
-      lat: this.roundResults.location.latitude,
-      lng: this.roundResults.location.longitude,
-    };
-    const imageElement = document.createElement('img');
-    imageElement.src = '/location.svg';
-    imageElement.style.height = '30px';
-    imageElement.style.width = '30px';
-    imageElement.style.transform = 'translateY(50%)';
-    this.googleMapsService.createMarker({
-      map,
-      position: location,
-      content: imageElement,
+    this.roundResults.players.forEach((player) => {
+      this.drawGuess(map, player);
     });
 
-    if (guess) {
-      map.fitBounds({
-        east: Math.max(location.lng, guess.lng),
-        west: Math.min(location.lng, guess.lng),
-        north: Math.max(location.lat, guess.lat),
-        south: Math.min(location.lat, guess.lat),
-      });
+    this.fitMapToGuesses(map);
+  }
 
-      const lineSymbol = {
-        path: 'M 0,-1 0,1',
-        strokeOpacity: 1,
-        scale: 3,
-      };
-      new google.maps.Polyline({
-        path: [
-          { lat: location.lat, lng: location.lng },
-          { lat: guess.lat, lng: guess.lng },
-        ],
-        strokeColor: '#000000',
-        geodesic: true,
-        strokeOpacity: 0,
-        strokeWeight: 2,
-        icons: [
-          {
-            icon: lineSymbol,
-            offset: '0',
-            repeat: '20px',
-          },
-        ],
-        map: map,
-      });
-    } else {
-      map.setCenter(location);
-      map.setZoom(15);
+  drawTarget(map: google.maps.Map) {
+    const target = {
+      lat: this.roundResults.target.latitude,
+      lng: this.roundResults.target.longitude,
+    };
+
+    this.googleMapsService.createPin({
+      map,
+      position: target,
+    });
+  }
+
+  drawGuess(map: google.maps.Map, playerResults: PlayerRoundResults) {
+    if (!playerResults.guess) {
+      return;
     }
+
+    const guess = {
+      lat: playerResults.guess.latitude,
+      lng: playerResults.guess.longitude,
+    };
+
+    const target = {
+      lat: this.roundResults.target.latitude,
+      lng: this.roundResults.target.longitude,
+    };
+
+    const playerMaker = this.domService.createComponent(PlayerAvatarComponent, {
+      name: playerResults.playerName,
+      color: playerResults.playerColor,
+    });
+    playerMaker.style.display = 'block';
+    playerMaker.style.transform = 'translateY(50%)'; // Adjust this value for centering the component
+    this.googleMapsService.createMarker({
+      map,
+      position: guess,
+      content: playerMaker,
+    });
+
+    const lineSymbol = {
+      path: 'M 0,-1 0,1',
+      strokeOpacity: 1,
+      scale: 3,
+    };
+    new google.maps.Polyline({
+      path: [
+        { lat: target.lat, lng: target.lng },
+        { lat: guess.lat, lng: guess.lng },
+      ],
+      strokeColor: '#000000',
+      geodesic: true,
+      strokeOpacity: 0,
+      strokeWeight: 2,
+      icons: [
+        {
+          icon: lineSymbol,
+          offset: '0',
+          repeat: '20px',
+        },
+      ],
+      map: map,
+    });
+  }
+
+  fitMapToGuesses(map: google.maps.Map) {
+    const bounds = new google.maps.LatLngBounds();
+
+    bounds.extend({
+      lat: this.roundResults.target.latitude,
+      lng: this.roundResults.target.longitude,
+    });
+
+    this.roundResults.players.forEach((player) => {
+      if (player.guess) {
+        bounds.extend({
+          lat: player.guess.latitude,
+          lng: player.guess.longitude,
+        });
+      }
+    });
+
+    map.fitBounds(bounds);
   }
 
   showFinalResults() {
