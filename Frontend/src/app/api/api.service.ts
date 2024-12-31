@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { map, Observable, Subject } from 'rxjs';
+import { catchError, from, map, Observable, Subject, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { CreateGame } from './models/create-game.model';
 import { Place } from './models/place.model';
 import { GameStage } from './stages/game-stage.model';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +33,9 @@ export class ApiService implements OnDestroy {
   }
 
   public findPlaces(search: string): Observable<Place[]> {
-    return this.httpClient.get<Place[]>(`${environment.apiUrl}/find-places?search=${search}`);
+    return this.httpClient.get<Place[]>(
+      `${environment.apiUrl}/find-places?search=${search}`,
+    );
   }
 
   public createGame(placeId: string): Observable<string> {
@@ -44,8 +46,10 @@ export class ApiService implements OnDestroy {
       .pipe(map((response) => response.gameId));
   }
 
-  public joinGame(gameId: string): void {
-    this.hubConnection.send('JoinGame', gameId);
+  public joinGame(gameId: string, playerName: string): Observable<void> {
+    return from(this.hubConnection.invoke('JoinGame', gameId, playerName)).pipe(
+      catchError((error: Error) => throwError(() => this.handleError(error))),
+    );
   }
 
   public startGame(gameId: string): void {
@@ -76,5 +80,11 @@ export class ApiService implements OnDestroy {
     this.hubConnection.on('ReceiveGameStage', (stage: GameStage) => {
       this.gameStage.next(stage);
     });
+  }
+
+  private handleError(error: Error): Error {
+    const match = error.message.match(/HubException:\s*(.+)/);
+
+    return match ? new Error(match[1]) : new Error('An unknown error occurred');
   }
 }

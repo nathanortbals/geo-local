@@ -1,4 +1,6 @@
-@if (stage$ | async; as stage) {
+@let stage = stage$ | async;
+
+@if (stage) {
   @switch (stage.type) {
     @case ("Lobby") {
       <app-lobby [lobby]="stage" />
@@ -13,4 +15,6 @@
       <app-final-results [finalResults]="stage" />
     }
   }
+} @else {
+  <app-join-game [gameId]="gameId" />
 }

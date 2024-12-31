@@ -7,6 +7,8 @@ namespace GeoLocal.Game
     {
         public string Id { get; }
 
+        public IList<Player> Players { get; }
+
         public GameBounds Bounds { get; }
 
         public Options Options { get; } = new Options(60);
@@ -25,11 +27,29 @@ namespace GeoLocal.Game
             GameService gameService)
         {
             Id = GenerateGameId();
+            Players = [];
             Bounds = bounds;
-            CurrentStage = new Lobby(Id, bounds);
+            CurrentStage = new Lobby(Id, bounds, Players);
             Rounds = ConstructRounds(coordinates);
             
             this.gameService = gameService;
+        }
+
+        public async Task<string?> JoinGame(string playerName)
+        {
+            if (Players.Count >= 30)
+            {
+                return "Game is full";
+            }
+            else if (Players.Any(p => p.Name.Equals(playerName, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                return "Name is already taken";
+            }
+
+            Players.Add(new Player(playerName, this));
+            await UpdateStage(new Lobby(Id, Bounds, Players));
+            
+            return null;
         }
 
         public async Task StartGame()
@@ -82,7 +102,7 @@ namespace GeoLocal.Game
         public async void PlayAgain(IEnumerable<Coordinates> coordinates)
         {
             Rounds = ConstructRounds(coordinates);
-            await UpdateStage(new Lobby(Id, Bounds));
+            await UpdateStage(new Lobby(Id, Bounds, Players));
         }
 
         public async Task UpdateStage(IStage stage)

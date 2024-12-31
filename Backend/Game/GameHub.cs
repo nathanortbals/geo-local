@@ -1,20 +1,22 @@
 ﻿using GeoLocal.Game.Stages;
 using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
 
 namespace GeoLocal.Game
 {
     public class GameHub(GameService gameService, GameFactory gameFactory) : Hub<IGameClient>
     {
-        public async Task JoinGame(string gameId)
+        public async Task JoinGame(string gameId, string playerName)
         {
-            var game = gameService.GetGame(gameId);
-            if (game == null)
+            var game = gameService.GetGame(gameId) ?? throw new HubException("Game was not found");
+            
+            var error = await game.JoinGame(playerName);
+            if (error is not null)
             {
-                return;
+                throw new HubException(error);
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
-
             await Clients.Caller.ReceiveGameStage(game.CurrentStage);
         }
 
