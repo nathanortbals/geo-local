@@ -1,23 +1,14 @@
-﻿using GeoLocal.Game;
-
-namespace GeoLocal.Game.Stages
+﻿namespace GeoLocal.Game.Stages
 {
     public record RoundResults(
         string GameId,
         int RoundNumber,
-        Coordinates Location,
-        Coordinates? Guess,
-        int Score,
+        Coordinates Target,
+        IEnumerable<PlayerRoundResults> Players,
         bool IsFinalRound) : IStage
     {
         public string Type => "RoundResults";
-
-        public double? DistanceInMeters
-        {
-            get
-            {
-                return Guess != null ? DistanceCalculator.HaversineDistance(Guess, Location) : null;
-            }
-        }
     }
+
+    public record PlayerRoundResults(string PlayerName, string PlayerColor, int RoundScore, int TotalScore, Coordinates? Guess, double? DistanceInMeters);
 }

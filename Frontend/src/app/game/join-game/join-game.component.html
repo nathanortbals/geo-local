@@ -1,0 +1,21 @@
+<div
+  class="h-full bg-gradient-to-t from-gray-950 to-[#001941] flex flex-col items-center justify-center gap-8"
+>
+  <h1 class="text-white text-3xl font-bold italic">Enter your Name</h1>
+  <input
+    [formControl]="formControl"
+    class="h-10 bg-gray-100 w-full px-9 focus:outline-none text-center rounded-full focus:placeholder:invisible shadow-lg max-w-96"
+    maxlength="20"
+  />
+  <app-button (clicked)="joinGame()" class="block w-36" [loading]="loading">
+    Join Game
+  </app-button>
+  <p
+    class="text-red-700 h-6 truncate"
+    [ngClass]="{
+      invisible: !errorMessage,
+    }"
+  >
+    {{ errorMessage }}
+  </p>
+</div>

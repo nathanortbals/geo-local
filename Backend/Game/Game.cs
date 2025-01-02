@@ -1,11 +1,12 @@
 ﻿using GeoLocal.Game.Stages;
-using Microsoft.AspNetCore.SignalR;
 
 namespace GeoLocal.Game
 {
     public class Game
     {
         public string Id { get; }
+
+        public IList<Player> Players { get; }
 
         public GameBounds Bounds { get; }
 
@@ -15,9 +16,7 @@ namespace GeoLocal.Game
 
         public IEnumerable<Round> Rounds { get; private set; }
 
-        public int TotalScore => Rounds.Sum(r => r.Score);
-
-        private GameService gameService { get; }
+        private GameService GameService { get; }
 
         public Game(
             GameBounds bounds,
@@ -25,11 +24,31 @@ namespace GeoLocal.Game
             GameService gameService)
         {
             Id = GenerateGameId();
+            Players = [];
             Bounds = bounds;
-            CurrentStage = new Lobby(Id, bounds);
+            CurrentStage = new Lobby(Id, bounds, []);
             Rounds = ConstructRounds(coordinates);
             
-            this.gameService = gameService;
+            GameService = gameService;
+        }
+
+        public async Task<string?> JoinGame(string playerName, string connectionId)
+        {
+            if (Players.Count >= 30)
+            {
+                return "Game is full";
+            }
+            else if (Players.Any(p => p.Name.Equals(playerName, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                return "Name is already taken";
+            }
+
+            Players.Add(new Player(playerName, connectionId, this));
+
+            var lobbyPlayers = Players.Select(p => new LobbyPlayer(p.Name, p.Color, p.IsHost)).ToList();
+            await UpdateStage(new Lobby(Id, Bounds, lobbyPlayers));
+            
+            return null;
         }
 
         public async Task StartGame()
@@ -43,31 +62,40 @@ namespace GeoLocal.Game
 
             var roundEndsAt = DateTime.UtcNow.AddSeconds(Options.RoundLengthsInSeconds);
 
-            var guessingStage = new Guessing(Id, roundNumber, round.Coordinate, Bounds, roundEndsAt, Options.RoundLengthsInSeconds);
+            var guessingStage = new Guessing(Id, roundNumber, round.Target, Bounds, roundEndsAt, Options.RoundLengthsInSeconds);
             await UpdateStage(guessingStage);
 
-            gameService.ScheduleJob(new GameJob(Id, roundEndsAt, (g) => g.ShowRoundResults(roundNumber)));
+            GameService.ScheduleJob(new GameJob(Id, roundEndsAt, (g) => g.ShowRoundResults(roundNumber)));
         }
 
-        public void SubmitGuess(int roundNumber, Coordinates guess)
+        public void SubmitGuess(int roundNumber, string playerName, Coordinates guess)
         {
             var round = Rounds.SingleOrDefault(round => round.RoundNumber == roundNumber) ?? throw new Exception($"Round {roundNumber} does not exist.");
 
-            round.Guess = guess;
+            round.SubmitGuess(playerName, guess);
         }
 
         public async Task ShowRoundResults(int roundNumber)
         {
             var round = Rounds.SingleOrDefault(round => round.RoundNumber == roundNumber) ?? throw new Exception($"Round {roundNumber} does not exist.");
 
-            var nextStageAt = DateTime.UtcNow.AddSeconds(Options.RoundResultsInSeconds);
+            var playerRoundResults = Players
+                .Select(p =>
+                {
+                    var guess = round.Guesses.TryGetValue(p.Name, out var g) ? g : null;
+                    var roundScore = guess?.Score ?? 0;
+                    var totalScore = p.TotalScore;
+
+                    return new PlayerRoundResults(p.Name, p.Color, roundScore, totalScore, guess?.Coordinates, guess?.DistanceInMeters);
+                })
+                .OrderByDescending(p => p.TotalScore)
+                .ToList();
 
             var roundResults = new RoundResults(
                 Id,
                 round.RoundNumber,
-                round.Coordinate,
-                round.Guess,
-                round.Score,
+                round.Target,
+                playerRoundResults,
                 roundNumber == Rounds.Count());
 
             await UpdateStage(roundResults);
@@ -75,20 +103,27 @@ namespace GeoLocal.Game
 
         public async Task ShowFinalResults()
         {
-            var finalResult = new FinalResults(Id, TotalScore);
+            var playerFinalResults = Players
+                .Select(p => new PlayerFinalResults(p.Name, p.Color, p.TotalScore))
+                .OrderByDescending(p => p.TotalScore)
+                .ToList();
+
+            var finalResult = new FinalResults(Id, playerFinalResults);
             await UpdateStage(finalResult);
         }
  
         public async void PlayAgain(IEnumerable<Coordinates> coordinates)
         {
             Rounds = ConstructRounds(coordinates);
-            await UpdateStage(new Lobby(Id, Bounds));
+
+            var lobbyPlayers = Players.Select(p => new LobbyPlayer(p.Name, p.Color, p.IsHost)).ToList();
+            await UpdateStage(new Lobby(Id, Bounds, lobbyPlayers));
         }
 
         public async Task UpdateStage(IStage stage)
         {
             CurrentStage = stage;
-            await gameService.UpdateStage(Id, stage);
+            await GameService.UpdateStage(Id, stage);
         }
 
         private static string GenerateGameId()

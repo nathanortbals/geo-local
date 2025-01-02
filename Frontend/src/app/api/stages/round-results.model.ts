@@ -4,9 +4,16 @@ export interface RoundResults {
   type: 'RoundResults';
   gameId: string;
   roundNumber: number;
-  location: Coordinates;
-  guess?: Coordinates;
-  score: number;
+  target: Coordinates;
+  players: PlayerRoundResults[];
   isFinalRound: boolean;
+}
+
+export interface PlayerRoundResults {
+  playerName: string;
+  playerColor: string;
+  roundScore: number;
+  totalScore: number;
+  guess?: Coordinates;
   distanceInMeters?: number;
 }
