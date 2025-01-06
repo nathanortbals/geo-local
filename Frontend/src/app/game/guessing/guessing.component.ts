@@ -70,7 +70,7 @@ export class GuessingComponent implements AfterViewInit, OnInit {
       draggableCursor: 'crosshair',
     });
 
-    this.drawMapCircle(map);
+    this.drawMapBounds(map);
 
     map.addListener('click', (event: google.maps.MapMouseEvent) => {
       if (this.currentMarker) {
@@ -104,57 +104,24 @@ export class GuessingComponent implements AfterViewInit, OnInit {
     return progress;
   }
 
-  private drawMapCircle(map: google.maps.Map) {
-    // Define the circle center and radius (in meters)
-    const circleCenter = {
-      lat: this.guessing.bounds.center.latitude,
-      lng: this.guessing.bounds.center.longitude,
-    };
-    const circleRadius = this.guessing.bounds.radiusInMeters;
-
-    // Define the outer bounds of the map as a large rectangle
-    const outerBounds = [
-      new google.maps.LatLng(85, 180),
-      new google.maps.LatLng(85, 90),
-      new google.maps.LatLng(85, 0),
-      new google.maps.LatLng(85, -90),
-      new google.maps.LatLng(85, -180),
-      new google.maps.LatLng(0, -180),
-      new google.maps.LatLng(-85, -180),
-      new google.maps.LatLng(-85, -90),
-      new google.maps.LatLng(-85, 0),
-      new google.maps.LatLng(-85, 90),
-      new google.maps.LatLng(-85, 180),
-      new google.maps.LatLng(0, 180),
-      new google.maps.LatLng(85, 180),
-    ];
-
-    // Get the circle's path as a set of LatLng points
-    const circlePath = [];
-    const bounds = new google.maps.LatLngBounds();
-    const numPoints = 100; // Number of points to define the circle
-    for (let i = 0; i < numPoints; i++) {
-      const angle = (i / numPoints) * 360; // Angle in degrees
-      const point = google.maps.geometry.spherical.computeOffset(
-        circleCenter,
-        circleRadius,
-        angle,
-      );
-      circlePath.push(point);
-      bounds.extend(point);
-    }
-
-    // Create a polygon with the outer bounds and the reversed circle path as a hole
-    new google.maps.Polygon({
-      paths: [outerBounds, circlePath], // Outer bounds first, reversed circle path as a hole
+  private drawMapBounds(map: google.maps.Map) {
+    map.data.addGeoJson(this.guessing.bounds.outsideArea);
+    map.data.setStyle({
       strokeColor: '#000000',
       strokeOpacity: 0,
       strokeWeight: 0,
       fillColor: '#000000',
-      fillOpacity: 0.3, // Adjust opacity for greyed-out effect
-      map: map,
+      fillOpacity: 0.3,
     });
 
-    map.fitBounds(bounds, 0);
+    map.fitBounds(
+      {
+        north: this.guessing.bounds.boundingBox.maxLatitude,
+        south: this.guessing.bounds.boundingBox.minLatitude,
+        east: this.guessing.bounds.boundingBox.maxLongitude,
+        west: this.guessing.bounds.boundingBox.minLongitude,
+      },
+      0,
+    );
   }
 }

@@ -3,8 +3,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { catchError, from, map, Observable, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { City } from './models/city.model';
 import { CreateGame } from './models/create-game.model';
-import { Place } from './models/place.model';
 import { GameStage } from './stages/game-stage.model';
 
 @Injectable({
@@ -46,16 +46,17 @@ export class ApiService implements OnDestroy {
     return connectionId;
   }
 
-  public findPlaces(search: string): Observable<Place[]> {
-    return this.httpClient.get<Place[]>(
-      `${environment.apiUrl}/find-places?search=${search}`,
+  public findCities(search: string): Observable<City[]> {
+    return this.httpClient.get<City[]>(
+      `${environment.apiUrl}/find-cities?search=${search}`,
     );
   }
 
-  public createGame(placeId: string): Observable<string> {
+  public createGame(osmId: number, name: string): Observable<string> {
     return this.httpClient
       .post<CreateGame>(`${environment.apiUrl}/create-game`, {
-        placeId,
+        osmId,
+        name,
       })
       .pipe(map((response) => response.gameId));
   }

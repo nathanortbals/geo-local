@@ -11,7 +11,7 @@ namespace GeoLocal.Game.CreateGame
         [SwaggerResponse(201, "Game created", typeof(CreateGameResponse))]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest createGameRequest)
         {
-            var game = await gameFactory.CreateGame(createGameRequest.PlaceId);
+            var game = await gameFactory.CreateGame(createGameRequest.OsmId, createGameRequest.Name);
 
             var response = new CreateGameResponse(game.Id);
 

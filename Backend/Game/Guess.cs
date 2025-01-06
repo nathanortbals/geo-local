@@ -24,7 +24,7 @@
                     return 5000;
                 }
 
-                var maxDistance = Round.Game.Bounds.RadiusInMeters * 2;
+                var maxDistance = Round.Game.Bounds.BoundingBox.MaximumDistanceInMeters * 2;
                 var score = 5000 * Math.Exp(-10 * (distanceFromGuess / maxDistance));
 
                 return (int)Math.Round(score);

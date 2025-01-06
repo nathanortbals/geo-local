@@ -64,23 +64,22 @@ export class LobbyComponent implements AfterViewInit, OnChanges {
       },
     );
 
-    const circle = new google.maps.Circle({
+    map.data.addGeoJson(this.lobby.bounds.insideArea);
+    map.data.setStyle({
       strokeOpacity: 0.5,
       strokeWeight: 0.75,
       fillColor: '#FEE12B',
       fillOpacity: 0.35,
-      map,
-      center: {
-        lat: this.lobby.bounds.center.latitude,
-        lng: this.lobby.bounds.center.longitude,
-      },
-      radius: this.lobby.bounds.radiusInMeters,
     });
-
-    const bounds = circle.getBounds();
-    if (bounds) {
-      map.fitBounds(bounds);
-    }
+    map.fitBounds(
+      {
+        north: this.lobby.bounds.boundingBox.maxLatitude,
+        south: this.lobby.bounds.boundingBox.minLatitude,
+        east: this.lobby.bounds.boundingBox.maxLongitude,
+        west: this.lobby.bounds.boundingBox.minLongitude,
+      },
+      0,
+    );
   }
 
   startGame(): void {
