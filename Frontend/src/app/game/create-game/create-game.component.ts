@@ -1,29 +1,19 @@
-import { AsyncPipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import {
-  debounceTime,
-  interval,
-  map,
-  Observable,
-  of,
-  startWith,
-  switchMap,
-  take,
-} from 'rxjs';
+import { interval, map, Observable, take } from 'rxjs';
 import { ApiService } from '../../api/api.service';
-import { Place } from '../../api/models/place.model';
+import { City } from '../../api/models/city.model';
 import { ButtonComponent } from '../../shared/button/button.component';
 
 @Component({
   selector: 'app-create-game',
-  imports: [AsyncPipe, ReactiveFormsModule, NgClass, ButtonComponent],
+  imports: [AsyncPipe, ReactiveFormsModule, ButtonComponent],
   templateUrl: './create-game.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,65 +21,63 @@ export class CreateGameComponent {
   private fullTitle = 'How well do you know your city?';
 
   public loading = false;
+  public errorMessage: string | null = null;
+  public searchResults: City[] = [];
 
   public currentTitle$: Observable<string> = interval(75).pipe(
     take(this.fullTitle.length + 1),
     map((i) => this.fullTitle.slice(0, i)),
   );
 
-  public formGroup = new FormGroup({
-    searchTerm: new FormControl<string>(''),
-    selectedPlaceId: new FormControl<string | null>(null, Validators.required),
-  });
-
-  public searchResults$: Observable<Place[] | null> =
-    this.formGroup.controls.searchTerm.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      switchMap((searchTerm) => {
-        if (!searchTerm || searchTerm === '') {
-          return of(null);
-        }
-
-        return this.apiService.findPlaces(searchTerm);
-      }),
-    );
+  public formControl = new FormControl<string>('');
 
   constructor(
     private readonly apiService: ApiService,
     private readonly router: Router,
+    private readonly changeDetectorRef: ChangeDetectorRef,
   ) {}
 
-  selectPlace(place: Place): void {
-    this.formGroup.patchValue({
-      searchTerm: place.name,
-      selectedPlaceId: place.id,
+  selectCity(city: City): void {
+    this.loading = true;
+    this.apiService.createGame(city.osmId, city.name).subscribe({
+      next: (gameId) => {
+        this.loading = false;
+        this.router.navigate(['/game', gameId]);
+      },
+      error: () => {
+        this.loading = false;
+      },
     });
   }
 
   clearSearch(): void {
-    this.formGroup.patchValue({
-      searchTerm: '',
-      selectedPlaceId: null,
-    });
+    this.searchResults = [];
+    this.formControl.setValue('');
   }
 
-  createGame(): void {
-    if (this.formGroup.invalid) {
+  search(): void {
+    if (this.formControl.value === '') {
       return;
     }
 
     this.loading = true;
-    this.apiService
-      .createGame(this.formGroup.value.selectedPlaceId!)
-      .subscribe({
-        next: (gameId) => {
-          this.loading = false;
-          this.router.navigate(['/game', gameId]);
-        },
-        error: () => {
-          this.loading = false;
-        },
-      });
+    this.errorMessage = null;
+    this.apiService.findCities(this.formControl.value!).subscribe({
+      next: (cities) => {
+        this.loading = false;
+        this.searchResults = cities;
+        if (cities.length === 0) {
+          this.errorMessage = 'No cities matched your search term.';
+        }
+
+        this.changeDetectorRef.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage = 'Error searching for cities, please try again';
+        this.searchResults = [];
+        this.changeDetectorRef.detectChanges();
+      },
+    });
   }
 }

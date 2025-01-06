@@ -5,6 +5,9 @@ namespace GeoLocal.Game.CreateGame
     public class CreateGameRequest
     {
         [Required]
-        public string PlaceId { get; init; } = string.Empty;
+        public int OsmId { get; init; }
+
+        [Required]
+        public string Name { get; init; } = string.Empty;
     }
 }

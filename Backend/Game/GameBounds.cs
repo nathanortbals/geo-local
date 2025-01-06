@@ -1,41 +1,28 @@
-﻿using GeoLocal.GoogleMaps;
-using System;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 
 namespace GeoLocal.Game
 {
-    public record GameBounds(string Name, Coordinates Center, double Radius, double RadiusInMeters)
+    public record GameBounds(int OsmId, string Name, FeatureCollection InsideArea, FeatureCollection OutsideArea, BoundingBox BoundingBox)
     {
-        public static GameBounds CalculateBounds(GoogleMapsPlaceResponse place)
+        public Coordinates GetRandomCoordinates(Random random)
         {
-            // Find distance to each edge of the viewport
-            var distanceToNorth = Math.Abs(place.Location.Latitude - place.ViewPort.High.Latitude);
-            var distanceToEast = Math.Abs(place.Location.Longitude - place.ViewPort.High.Longitude);
-            var distanceToSouth = Math.Abs(place.Location.Latitude - place.ViewPort.Low.Latitude);
-            var distanceToWest = Math.Abs(place.Location.Longitude - place.ViewPort.Low.Longitude);
+            while(true)
+            {
+                var coordinates = BoundingBox.GetRandomCoordinates(random);
 
-            // Find the smallest distance to an edge
-            var maxRadius = Math.Min(Math.Min(distanceToSouth, distanceToWest), Math.Min(distanceToNorth, distanceToEast));
-
-            // Calculate the distance in meters
-            var center = new Coordinates(place.Location.Latitude, place.Location.Longitude);
-            var maxRadiusInMeters = DistanceCalculator.HaversineDistance(center, new Coordinates(center.Latitude, center.Longitude + maxRadius));
-
-            return new GameBounds(place.FormattedAddress, center, maxRadius, maxRadiusInMeters);
+                if (IsWithin(coordinates))
+                {
+                    return coordinates;
+                }
+            }
         }
 
-        public Coordinates GenerateRandomPoint(Random random)
+        public bool IsWithin(Coordinates coordinates)
         {
-            // Get a random angle of the circle
-            var angle = random.NextDouble() * 2 * Math.PI;
+            var point = new Point(coordinates.Longitude, coordinates.Latitude);
 
-            // Generate a weighted radius (sqrt(random) gives more weight near the center)
-            var weightedRadius = Math.Sqrt(random.NextDouble()) * Radius;
-
-            // Convert polar coordinates to cartesian coordinates
-            var latitude = Center.Latitude + weightedRadius * Math.Cos(angle);
-            var longitude = Center.Longitude + weightedRadius * Math.Sin(angle);
-
-            return new Coordinates(latitude, longitude);
+            return InsideArea.Any(f => f.Geometry.Contains(point));
         }
     }
 }

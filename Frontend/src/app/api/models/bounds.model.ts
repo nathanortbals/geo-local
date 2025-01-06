@@ -1,8 +1,9 @@
-import { Coordinates } from './coordinates.model';
+import { BoundingBox } from './bounding-box.model';
 
 export interface Bounds {
+  osmId: number;
   name: string;
-  center: Coordinates;
-  radius: number;
-  radiusInMeters: number;
+  insideArea: object;
+  outsideArea: object;
+  boundingBox: BoundingBox;
 }
