@@ -49,9 +49,5 @@ export class GameComponent {
     this.gameId = gameId;
 
     this.stage$ = apiService.gameStage$.pipe(startWith(null));
-
-    this.stage$.subscribe((stage) => {
-      console.log(stage);
-    });
   }
 }
