@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -6,28 +5,29 @@ import {
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { interval, map, Observable, take } from 'rxjs';
 import { ApiService } from '../../api/api.service';
 import { City } from '../../api/models/city.model';
 import { ButtonComponent } from '../../shared/button/button.component';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
+import { SecondaryButtonComponent } from '../../shared/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-create-game',
-  imports: [AsyncPipe, ReactiveFormsModule, ButtonComponent],
+  imports: [
+    ReactiveFormsModule,
+    ButtonComponent,
+    SecondaryButtonComponent,
+    SecondaryButtonComponent,
+    LoadingSpinnerComponent,
+  ],
   templateUrl: './create-game.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateGameComponent {
-  private fullTitle = 'How well do you know your city?';
-
   public loading = false;
+  public creatingGame = false;
   public errorMessage: string | null = null;
   public searchResults: City[] = [];
-
-  public currentTitle$: Observable<string> = interval(75).pipe(
-    take(this.fullTitle.length + 1),
-    map((i) => this.fullTitle.slice(0, i)),
-  );
 
   public formControl = new FormControl<string>('');
 
@@ -38,14 +38,14 @@ export class CreateGameComponent {
   ) {}
 
   selectCity(city: City): void {
-    this.loading = true;
+    this.creatingGame = true;
     this.apiService.createGame(city.osmId, city.name).subscribe({
       next: (gameId) => {
         this.loading = false;
         this.router.navigate(['/game', gameId]);
       },
       error: () => {
-        this.loading = false;
+        this.creatingGame = false;
       },
     });
   }

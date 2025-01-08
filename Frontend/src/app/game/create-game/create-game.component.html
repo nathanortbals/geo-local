@@ -1,21 +1,15 @@
 <div
-  class="h-full bg-cover bg-center flex flex-col items-center justify-center bg-black gap-4 p-8"
-  style="background-image: url(&quot;/background-bright.webp&quot;)"
+  class="h-full bg-gradient-to-t from-gray-950 to-[#001941] flex flex-col items-center justify-center bg-black gap-4 p-8"
 >
-  <div class="flex">
-    <h1
-      class="text-6xl text-white font-mono min-h-16 text-center [text-shadow:_3px_3px_0_rgb(0_0_0_/_40%)] my-16"
-    >
-      {{ currentTitle$ | async }}
-      <span class="border-r-4 border-white animate-blink"></span>
-    </h1>
-  </div>
-
-  <div class="flex gap-4 w-full max-w-96">
-    <div class="relative">
+  @if (creatingGame) {
+    <app-loading-spinner class="h-16 w-16" />
+    <p class="text-white font-bold text-xl italic mt-6">Creating Game...</p>
+  } @else if (searchResults.length === 0) {
+    <h1 class="text-white text-3xl font-bold italic">Find your City</h1>
+    <div class="relative w-full max-w-80">
       <input
         [formControl]="formControl"
-        placeholder="Find your city"
+        placeholder="Enter a city name"
         class="h-10 bg-gray-100 w-full px-9 focus:outline-none text-center rounded-[1.25rem] focus:placeholder:invisible shadow-lg"
       />
 
@@ -31,24 +25,25 @@
     <app-button (clicked)="search()" class="block w-36" [loading]="loading">
       Search
     </app-button>
-  </div>
-
-  <div class="h-8 -m-4"></div>
-
-  <div class="max-w-96 w-full h-[12.5rem]">
     @if (errorMessage) {
       <div class="text-red-500 font-bold text-xl">{{ errorMessage }}</div>
-    } @else {
-      <div class="rounded-[1.25rem] overflow-hidden shadow-lg">
-        @for (city of searchResults; track city.osmId) {
-          <button
-            (click)="selectCity(city)"
-            class="h-10 px-4 truncate w-full bg-gray-100 hover:bg-gray-300"
-          >
-            {{ city.name }}
-          </button>
-        }
-      </div>
     }
-  </div>
+  } @else {
+    <h1 class="text-white text-3xl font-bold italic">Select a City</h1>
+    <div class="flex flex-col w-full max-w-96 mb-2">
+      @for (city of searchResults; track city.osmId) {
+        <button
+          (click)="selectCity(city)"
+          class="h-10 px-4 truncate w-full text-white flex items-center justify-between py-4 hover:bg-blue-950"
+        >
+          <span>{{ city.name }}</span>
+          <img src="/arrow-right.svg" alt="Select City" class="h-8" />
+        </button>
+      }
+    </div>
+
+    <app-secondary-button (clicked)="searchResults = []"
+      >Search Again</app-secondary-button
+    >
+  }
 </div>
