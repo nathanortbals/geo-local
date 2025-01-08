@@ -1,6 +1,10 @@
 <a
-  class="bg-gradient-to-t from-gray-600 to-gray-400 border-b-4 border-gray-800 border-l-2 text-white rounded-full h-12 px-8 font-bold flex items-center justify-center shadow-md text-nowrap italic"
-  routerLink="/"
+  class="bg-gradient-to-t border-b-4 border-l-2 text-white rounded-full h-12 px-8 font-bold flex items-center justify-center shadow-md text-nowrap italic"
+  [ngClass]="{
+    'from-gray-600 to-gray-400 border-gray-800': color === 'gray',
+    'from-yellow-600 to-yellow-400 border-yellow-700': color === 'yellow',
+  }"
+  [routerLink]="routerLink"
 >
   <ng-content></ng-content>
 </a>

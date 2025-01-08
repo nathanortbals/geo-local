@@ -1,0 +1,23 @@
+<div
+  class="h-full w-full bg-cover bg-bottom flex flex-col items-center justify-center bg-black p-8"
+  style="background-image: url(&quot;/city.png&quot;)"
+>
+  <h1
+    class="text-6xl text-white font-mono min-h-16 text-center [text-shadow:_3px_3px_0_rgb(0_0_0_/_40%)] mb-32"
+  >
+    {{ currentTitle$ | async }}
+    <span class="border-r-4 border-white animate-blink"></span>
+  </h1>
+
+  <p class="text-white text-xl text-center w-full max-w-[36rem] mb-1">
+    GeoLocal is a game designed to put your knowledge of your local environment
+    to the test.
+  </p>
+  <p class="text-white text-xl text-center w-full max-w-[36rem] mb-8">
+    Test your knowledge and navigation skills by identifying locations in your
+    city before the timer runs out.
+  </p>
+  <app-link-button routerLink="/create-game" class="block w-48" color="yellow">
+    Start a Game
+  </app-link-button>
+</div>

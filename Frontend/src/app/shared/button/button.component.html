@@ -4,7 +4,7 @@
   (click)="clicked.emit()"
 >
   @if (loading) {
-    <app-loading-spinner />
+    <app-loading-spinner class="block h-8 w-8" />
   } @else {
     <ng-content></ng-content>
   }
