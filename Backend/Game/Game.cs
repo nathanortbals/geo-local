@@ -75,6 +75,19 @@ namespace GeoLocal.Game
             round.SubmitGuess(playerName, guess);
         }
 
+        public async Task FinalizeGuess(int roundNumber, string playerName)
+        {
+            var round = Rounds.SingleOrDefault(round => round.RoundNumber == roundNumber) ?? throw new Exception($"Round {roundNumber} does not exist.");
+            round.FinalizeGuess(playerName);
+
+            if (round.AllGuessesFinal)
+            {
+                await ShowRoundResults(roundNumber);
+                GameService.CancelNextJob(Id);
+            }
+        }
+
+
         public async Task ShowRoundResults(int roundNumber)
         {
             var round = Rounds.SingleOrDefault(round => round.RoundNumber == roundNumber) ?? throw new Exception($"Round {roundNumber} does not exist.");

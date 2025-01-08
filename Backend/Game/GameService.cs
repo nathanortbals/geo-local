@@ -28,6 +28,12 @@ namespace GeoLocal.Game
             Jobs.Enqueue(job);
         }
 
+        public void CancelNextJob(string gameId)
+        {
+            var job = Jobs.FirstOrDefault(j => j.GameId == gameId);
+            job?.Cancel();
+        }
+
         public async Task UpdateStage(string gameId, IStage stage)
         {
             await hubContext.Clients.Group(gameId).ReceiveGameStage(stage);

@@ -87,6 +87,10 @@ export class ApiService implements OnDestroy {
     this.hubConnection.send('SubmitGuess', gameId, roundNumber, coordinates);
   }
 
+  public finalizeGuess(gameId: string, roundNumber: number): void {
+    this.hubConnection.send('FinalizeGuess', gameId, roundNumber);
+  }
+
   public startNextRound(gameId: string, roundNumber: number) {
     this.hubConnection.send('StartNextRound', gameId, roundNumber);
   }
