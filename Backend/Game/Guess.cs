@@ -6,6 +6,8 @@
 
         public Round Round { get; } = round;
 
+        public bool Finalized { get; private set; } = false;
+
         public double DistanceInMeters
         {
             get
@@ -34,6 +36,11 @@
         public void UpdateGuess(Coordinates coordinates)
         {
             Coordinates = coordinates;
+        }
+
+        public void FinalizeGuess()
+        {
+            Finalized = true;
         }
     }
 }

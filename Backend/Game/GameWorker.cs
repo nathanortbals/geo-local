@@ -10,10 +10,13 @@
                 {
                     if (gameService.Jobs.TryDequeue(out var dequeuedJob))
                     {
-                        var game = gameService.GetGame(dequeuedJob.GameId);
-                        if (game != null)
+                        if (!dequeuedJob.IsCancelled)
                         {
-                            await dequeuedJob.Action(game);
+                            var game = gameService.GetGame(dequeuedJob.GameId);
+                            if (game != null)
+                            {
+                                await dequeuedJob.Action(game);
+                            }
                         }
                     }
                 }

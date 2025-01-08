@@ -69,6 +69,23 @@ namespace GeoLocal.Game
             return Task.CompletedTask;
         }
 
+        public async Task FinalizeGuess(string gameId, int roundNumber)
+        {
+            var game = gameService.GetGame(gameId);
+            if (game == null)
+            {
+                return;
+            }
+
+            var player = game.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+            if (player == null)
+            {
+                return;
+            }
+
+            await game.FinalizeGuess(roundNumber, player.Name);
+        }
+
         public async Task StartNextRound(string gameId, int roundNumber)
         {
             var game = gameService.GetGame(gameId);
