@@ -2,10 +2,11 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { interval, map, Observable, take } from 'rxjs';
 import { LinkButtonComponent } from '../shared/link-button/link-button.component';
+import { LogoComponent } from '../shared/logo/logo.component';
 
 @Component({
   selector: 'app-home',
-  imports: [AsyncPipe, LinkButtonComponent, LinkButtonComponent],
+  imports: [AsyncPipe, LinkButtonComponent, LinkButtonComponent, LogoComponent],
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

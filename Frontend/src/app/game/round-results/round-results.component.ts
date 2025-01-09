@@ -16,12 +16,19 @@ import { GoogleMapsService } from '../../google-maps.service';
 import { ButtonComponent } from '../../shared/button/button.component';
 import { DistancePipe } from '../../shared/distance-pipe/distance.pipe';
 import { DomService } from '../../shared/dom.service';
+import { LogoComponent } from '../../shared/logo/logo.component';
 import { NumberPipe } from '../../shared/number-pipe/number.pipe';
 import { PlayerAvatarComponent } from '../../shared/player-avatar/player-avatar.component';
 
 @Component({
   selector: 'app-round-results',
-  imports: [ButtonComponent, NumberPipe, DistancePipe, PlayerAvatarComponent],
+  imports: [
+    ButtonComponent,
+    NumberPipe,
+    DistancePipe,
+    PlayerAvatarComponent,
+    LogoComponent,
+  ],
   templateUrl: './round-results.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

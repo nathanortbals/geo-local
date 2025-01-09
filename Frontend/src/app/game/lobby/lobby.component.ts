@@ -14,6 +14,7 @@ import { Lobby } from '../../api/stages/lobby.model';
 import { GoogleMapsService } from '../../google-maps.service';
 import { ButtonComponent } from '../../shared/button/button.component';
 import { LinkButtonComponent } from '../../shared/link-button/link-button.component';
+import { LogoComponent } from '../../shared/logo/logo.component';
 import { PlayerAvatarComponent } from '../../shared/player-avatar/player-avatar.component';
 import { SecondaryButtonComponent } from '../../shared/secondary-button/secondary-button.component';
 
@@ -24,6 +25,7 @@ import { SecondaryButtonComponent } from '../../shared/secondary-button/secondar
     LinkButtonComponent,
     SecondaryButtonComponent,
     PlayerAvatarComponent,
+    LogoComponent,
   ],
   templateUrl: './lobby.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

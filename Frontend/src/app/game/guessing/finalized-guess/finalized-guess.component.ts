@@ -8,10 +8,11 @@ import {
 } from '@angular/core';
 import { Coordinates } from '../../../api/models/coordinates.model';
 import { GoogleMapsService } from '../../../google-maps.service';
+import { LogoComponent } from '../../../shared/logo/logo.component';
 
 @Component({
   selector: 'app-finalized-guess',
-  imports: [],
+  imports: [LogoComponent],
   templateUrl: './finalized-guess.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
