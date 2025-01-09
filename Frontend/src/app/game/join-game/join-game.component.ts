@@ -9,11 +9,12 @@ import {
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../api/api.service';
 import { ButtonComponent } from '../../shared/button/button.component';
+import { LogoComponent } from '../../shared/logo/logo.component';
 import { JoinGameCacheService } from './join-game-cache.service';
 
 @Component({
   selector: 'app-join-game',
-  imports: [ReactiveFormsModule, ButtonComponent, NgClass],
+  imports: [ReactiveFormsModule, ButtonComponent, NgClass, LogoComponent],
   templateUrl: './join-game.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

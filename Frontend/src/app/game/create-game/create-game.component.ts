@@ -9,6 +9,7 @@ import { ApiService } from '../../api/api.service';
 import { City } from '../../api/models/city.model';
 import { ButtonComponent } from '../../shared/button/button.component';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
+import { LogoComponent } from '../../shared/logo/logo.component';
 import { SecondaryButtonComponent } from '../../shared/secondary-button/secondary-button.component';
 
 @Component({
@@ -19,6 +20,7 @@ import { SecondaryButtonComponent } from '../../shared/secondary-button/secondar
     SecondaryButtonComponent,
     SecondaryButtonComponent,
     LoadingSpinnerComponent,
+    LogoComponent,
   ],
   templateUrl: './create-game.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
