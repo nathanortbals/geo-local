@@ -32,11 +32,13 @@ import { SecondaryButtonComponent } from '../../shared/secondary-button/secondar
 })
 export class LobbyComponent implements AfterViewInit, OnChanges {
   @Input({ required: true }) lobby!: Lobby;
+  @Input({ required: true }) playerName!: string;
 
   @ViewChild('previewMap', { read: ElementRef })
   previewMap: ElementRef<HTMLElement> | undefined;
 
   linkCopied = false;
+  isHost = false;
 
   constructor(
     private readonly googleMapsService: GoogleMapsService,
@@ -46,6 +48,10 @@ export class LobbyComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(): void {
     this.createMap();
+
+    this.isHost =
+      this.lobby.players.find((p) => p.name === this.playerName)?.isHost ??
+      false;
   }
 
   ngAfterViewInit(): void {

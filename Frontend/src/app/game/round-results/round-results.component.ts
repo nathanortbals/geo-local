@@ -34,11 +34,15 @@ import { PlayerAvatarComponent } from '../../shared/player-avatar/player-avatar.
 })
 export class RoundResultsComponent implements OnChanges, AfterViewInit {
   @Input({ required: true }) roundResults!: RoundResults;
+  @Input({ required: true }) playerName!: string;
 
   @ViewChild('map', { read: ElementRef })
   map: ElementRef<HTMLElement> | undefined;
 
   myRoundResults: PlayerRoundResults | undefined;
+
+  loading = false;
+  isHost = false;
 
   constructor(
     private readonly googleMapsService: GoogleMapsService,
@@ -52,6 +56,10 @@ export class RoundResultsComponent implements OnChanges, AfterViewInit {
     this.myRoundResults = this.roundResults.players.find(
       (player) => player.playerName === this.apiService.playerName,
     );
+
+    this.isHost =
+      this.roundResults.players.find((p) => p.playerName == this.playerName)
+        ?.isHost ?? false;
   }
 
   ngAfterViewInit(): void {

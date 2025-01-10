@@ -48,6 +48,8 @@ export class CreateGameComponent {
       },
       error: () => {
         this.creatingGame = false;
+        this.errorMessage = 'Error creating game, please try again';
+        this.changeDetectorRef.detectChanges();
       },
     });
   }

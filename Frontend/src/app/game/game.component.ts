@@ -32,6 +32,7 @@ import { RoundResultsComponent } from './round-results/round-results.component';
 export class GameComponent {
   stage$: Observable<GameStage | null>;
   gameId: string;
+  playerName: string | null = null;
 
   @ViewChild('previewMap', { read: ElementRef })
   previewMap: ElementRef<HTMLElement> | undefined;

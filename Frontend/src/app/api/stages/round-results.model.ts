@@ -12,6 +12,7 @@ export interface RoundResults {
 export interface PlayerRoundResults {
   playerName: string;
   playerColor: string;
+  isHost: boolean;
   roundScore: number;
   totalScore: number;
   guess?: Coordinates;

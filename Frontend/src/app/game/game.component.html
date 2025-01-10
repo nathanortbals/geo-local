@@ -1,20 +1,20 @@
 @let stage = stage$ | async;
 
-@if (stage) {
+@if (stage && playerName) {
   @switch (stage.type) {
     @case ("Lobby") {
-      <app-lobby [lobby]="stage" />
+      <app-lobby [lobby]="stage" [playerName]="playerName" />
     }
     @case ("Guessing") {
       <app-guessing [guessing]="stage" />
     }
     @case ("RoundResults") {
-      <app-round-results [roundResults]="stage" />
+      <app-round-results [roundResults]="stage" [playerName]="playerName" />
     }
     @case ("FinalResults") {
       <app-final-results [finalResults]="stage" />
     }
   }
 } @else {
-  <app-join-game [gameId]="gameId" />
+  <app-join-game [gameId]="gameId" (nameSelected)="playerName = $event" />
 }

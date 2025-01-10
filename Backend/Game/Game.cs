@@ -99,7 +99,7 @@ namespace GeoLocal.Game
                     var roundScore = guess?.Score ?? 0;
                     var totalScore = p.TotalScore;
 
-                    return new PlayerRoundResults(p.Name, p.Color, roundScore, totalScore, guess?.Coordinates, guess?.DistanceInMeters);
+                    return new PlayerRoundResults(p.Name, p.Color, p.IsHost, roundScore, totalScore, guess?.Coordinates, guess?.DistanceInMeters);
                 })
                 .OrderByDescending(p => p.TotalScore)
                 .ToList();

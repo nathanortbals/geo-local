@@ -10,5 +10,5 @@
         public string Type => "RoundResults";
     }
 
-    public record PlayerRoundResults(string PlayerName, string PlayerColor, int RoundScore, int TotalScore, Coordinates? Guess, double? DistanceInMeters);
+    public record PlayerRoundResults(string PlayerName, string PlayerColor, bool IsHost, int RoundScore, int TotalScore, Coordinates? Guess, double? DistanceInMeters);
 }
