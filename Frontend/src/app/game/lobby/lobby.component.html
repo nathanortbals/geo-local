@@ -11,11 +11,16 @@
     #previewMap
     class="col-start-2 row-start-3 h-full w-full max-w-2xl rounded-3xl border-white border-4"
   ></div>
+
   <div class="col-start-2 row-start-4 flex items-center justify-center gap-2">
-    <app-link-button routerLink="/" class="w-52">
-      Start a New Game
-    </app-link-button>
-    <app-button (clicked)="startGame()" class="w-52">Start Game</app-button>
+    @if (isHost) {
+      <app-link-button routerLink="/" class="w-52">
+        Start a New Game
+      </app-link-button>
+      <app-button (clicked)="startGame()" class="w-52">Start Game</app-button>
+    } @else {
+      <p class="text-white">Waiting for host to start the game.</p>
+    }
   </div>
   <h1 class="col-start-3 row-start-2 text-white text-3xl font-bold text-center">
     Players
@@ -23,9 +28,9 @@
   <div class="col-start-3 row-start-3 bg-gray-800 rounded-3xl overflow-hidden">
     <div class="h-full overflow-y-auto flex flex-1 flex-col gap-4 py-6 px-4">
       @for (player of lobby.players; track player.name) {
-        <div class="flex gap-4">
+        <div class="flex gap-4 w-full">
           <app-player-avatar [name]="player.name" [color]="player.color" />
-          <p class="text-white text-xl">{{ player.name }}</p>
+          <p class="text-white text-xl flex-1 truncate">{{ player.name }}</p>
         </div>
       }
     </div>

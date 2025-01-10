@@ -1,31 +1,36 @@
 <div class="h-full flex flex-col items-center justify-center p-4 gap-8">
   <app-logo class="fixed top-8 left-8" />
   <h1 class="text-white text-3xl italic font-bold">Final Results</h1>
-  <div class="bg-gray-800 rounded-3xl w-96">
-    <div class="flex items-center justify-between px-4 py-4">
-      <p class="text-gray-500">Place</p>
-      <p class="text-nowrap col-span-2">
-        <span class="text-gray-500">Final Score</span>
-      </p>
-    </div>
-    <div class="h-full flex flex-col gap-4 px-4 pb-8 max-h-96 overflow-y-auto">
-      @for (
-        player of finalResults.players;
-        track player.playerName;
-        let i = $index
-      ) {
-        <div class="flex items-center gap-4">
-          <p class="text-gray-400 w-3">{{ i + 1 }}.</p>
-          <app-player-avatar
-            [name]="player.playerName"
-            [color]="player.playerColor"
-          />
-          <p class="flex-1 text-white">{{ player.playerName }}</p>
-          <p class="text-white">{{ player.totalScore | number }}</p>
-        </div>
-      }
+  <div class="bg-gray-800 rounded-3xl w-96 overflow-hidden">
+    <div class="flex flex-col">
+      <div class="flex items-center justify-between px-4 py-4">
+        <p class="text-gray-500">Place</p>
+        <p class="text-nowrap col-span-2">
+          <span class="text-gray-500">Final Score</span>
+        </p>
+      </div>
+      <div
+        class="flex-1 flex flex-col gap-4 px-4 pb-8 max-h-96 overflow-y-auto"
+      >
+        @for (
+          player of finalResults.players;
+          track player.playerName;
+          let i = $index
+        ) {
+          <div class="flex items-center gap-4">
+            <p class="text-gray-400 w-3">{{ i + 1 }}.</p>
+            <app-player-avatar
+              [name]="player.playerName"
+              [color]="player.playerColor"
+            />
+            <p class="flex-1 text-white">{{ player.playerName }}</p>
+            <p class="text-white">{{ player.totalScore | number }}</p>
+          </div>
+        }
+      </div>
     </div>
   </div>
+
   <div class="flex flex-col items-center gap-2">
     <app-button (clicked)="playAgain()" class="w-52" [loading]="startingNewGame"
       >Play Again</app-button
