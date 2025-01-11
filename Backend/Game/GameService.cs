@@ -25,6 +25,11 @@ namespace GeoLocal.Game
 
         public void ScheduleJob(GameJob job)
         {
+            if(Jobs.Any(j => j.GameId == job.GameId))
+            {
+                return;
+            }
+
             Jobs.Enqueue(job);
         }
 
