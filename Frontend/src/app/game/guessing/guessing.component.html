@@ -3,7 +3,10 @@
   [totalDuration]="guessing.timeLimitSeconds"
 />
 @if (guessFinalized && currentGuess) {
-  <app-finalized-guess [coordinates]="currentGuess" />
+  <app-finalized-guess
+    [coordinates]="currentGuess"
+    (guessAgain)="guessAgain()"
+  />
 } @else {
   <app-guessing-map
     [guessing]="guessing"

@@ -51,4 +51,8 @@ export class GuessingComponent implements OnInit {
       this.guessing.roundNumber,
     );
   }
+
+  guessAgain() {
+    this.guessFinalized = false;
+  }
 }

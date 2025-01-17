@@ -16,6 +16,13 @@
   <div class="h-full" #streetView></div>
 </div>
 
+<button
+  class="rounded-full bg-[#444444] h-12 w-12 fixed bottom-32 left-2 flex items-center justify-center"
+  (click)="returnToStart()"
+>
+  <img src="flag-icon.svg" alt="Return to Start" class="h-8" />
+</button>
+
 <div
   class="fixed w-full h-full bottom-24 right-8 max-w-80 max-h-48 hover:max-w-4xl hover:max-h-[30rem] transition-all"
 >

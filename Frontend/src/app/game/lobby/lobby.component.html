@@ -17,7 +17,9 @@
       <app-link-button routerLink="/" class="w-52">
         Start a New Game
       </app-link-button>
-      <app-button (clicked)="startGame()" class="w-52">Start Game</app-button>
+      <app-button (clicked)="startGame()" class="w-52" [loading]="gameStarted"
+        >Start Game</app-button
+      >
     } @else {
       <p class="text-white">Waiting for host to start the game.</p>
     }
