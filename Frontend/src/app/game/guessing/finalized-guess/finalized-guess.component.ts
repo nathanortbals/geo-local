@@ -3,21 +3,25 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
+  Output,
   ViewChild,
 } from '@angular/core';
 import { Coordinates } from '../../../api/models/coordinates.model';
 import { GoogleMapsService } from '../../../google-maps.service';
 import { LogoComponent } from '../../../shared/logo/logo.component';
+import { SecondaryButtonComponent } from '../../../shared/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-finalized-guess',
-  imports: [LogoComponent],
+  imports: [LogoComponent, SecondaryButtonComponent],
   templateUrl: './finalized-guess.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinalizedGuessComponent implements AfterViewInit {
   @Input({ required: true }) coordinates!: Coordinates;
+  @Output() readonly guessAgain = new EventEmitter<void>();
 
   @ViewChild('map', { read: ElementRef })
   map: ElementRef<HTMLElement> | undefined;

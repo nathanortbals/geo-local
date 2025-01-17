@@ -39,6 +39,7 @@ export class LobbyComponent implements AfterViewInit, OnChanges {
 
   linkCopied = false;
   isHost = false;
+  gameStarted = false;
 
   constructor(
     private readonly googleMapsService: GoogleMapsService,
@@ -91,6 +92,7 @@ export class LobbyComponent implements AfterViewInit, OnChanges {
   }
 
   startGame(): void {
+    this.gameStarted = true;
     this.apiService.startGame(this.lobby.gameId);
   }
 

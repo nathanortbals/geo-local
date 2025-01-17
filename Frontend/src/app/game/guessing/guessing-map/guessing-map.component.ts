@@ -30,14 +30,16 @@ export class GuessingMapComponent implements OnInit, AfterViewInit {
   @Output() readonly guessFinalized = new EventEmitter<void>();
 
   @ViewChild('streetView', { read: ElementRef })
-  streetView: ElementRef<HTMLElement> | undefined;
+  streetViewContainer: ElementRef<HTMLElement> | undefined;
 
   @ViewChild('map', { read: ElementRef })
-  map: ElementRef<HTMLElement> | undefined;
+  mapContainer: ElementRef<HTMLElement> | undefined;
 
   currentMarker: google.maps.marker.AdvancedMarkerElement | null = null;
 
   timer$: Observable<number> | undefined;
+
+  streetView: google.maps.StreetViewPanorama | undefined;
 
   constructor(private readonly googleMapsService: GoogleMapsService) {}
 
@@ -46,28 +48,34 @@ export class GuessingMapComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (!this.streetView || !this.map) {
+    if (!this.streetViewContainer || !this.mapContainer) {
       return;
     }
 
-    this.googleMapsService.createStreetView(this.streetView.nativeElement, {
-      position: {
-        lat: this.guessing.location.latitude,
-        lng: this.guessing.location.longitude,
+    this.streetView = this.googleMapsService.createStreetView(
+      this.streetViewContainer.nativeElement,
+      {
+        position: {
+          lat: this.guessing.location.latitude,
+          lng: this.guessing.location.longitude,
+        },
+        showRoadLabels: false,
+        disableDefaultUI: true,
+        zoomControl: true,
+        zoomControlOptions: {
+          position: google.maps.ControlPosition.LEFT_BOTTOM,
+        },
       },
-      showRoadLabels: false,
-      disableDefaultUI: true,
-      zoomControl: true,
-      zoomControlOptions: {
-        position: google.maps.ControlPosition.LEFT_BOTTOM,
-      },
-    });
+    );
 
-    const map = this.googleMapsService.createMap(this.map.nativeElement, {
-      disableDefaultUI: true,
-      clickableIcons: false,
-      draggableCursor: 'crosshair',
-    });
+    const map = this.googleMapsService.createMap(
+      this.mapContainer.nativeElement,
+      {
+        disableDefaultUI: true,
+        clickableIcons: false,
+        draggableCursor: 'crosshair',
+      },
+    );
 
     this.drawMapBounds(map);
 
@@ -103,6 +111,15 @@ export class GuessingMapComponent implements OnInit, AfterViewInit {
 
   submitGuess() {
     this.guessFinalized.emit();
+  }
+
+  returnToStart() {
+    if (this.streetView) {
+      this.streetView.setPosition({
+        lat: this.guessing.location.latitude,
+        lng: this.guessing.location.longitude,
+      });
+    }
   }
 
   private drawMapBounds(map: google.maps.Map) {
